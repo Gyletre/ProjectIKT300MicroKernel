@@ -1,16 +1,16 @@
 
 using System;
 using System.Diagnostics;
+using IKT300.Plugins;
+using IKT300;
 
 
 public class MicroKernel
 {
     private static void Main()
     {
-        Console.WriteLine("Greetings, Universe");
+        Kernel kernel = new Kernel();
+        new TestPlugin(kernel);
+        kernel.Run();
     }
 }
-
-
-
-
