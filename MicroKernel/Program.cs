@@ -11,6 +11,7 @@ public class MicroKernel
     {
         Kernel kernel = new Kernel();
         new TestPlugin(kernel);
+        new GUIPlugin(kernel);
         kernel.Run();
     }
 }

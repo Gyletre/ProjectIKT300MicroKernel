@@ -51,3 +51,17 @@ public class Kernel
     }
 
 }
+public abstract class Plugin
+    {
+        protected Kernel kernel;
+        public Plugin(Kernel k)
+        {
+            kernel = k;
+            kernel.AddPlugin(this);
+        }
+        public int HeartMonitor()
+        {
+            return 1;
+        }
+        public abstract void Process();
+    }
