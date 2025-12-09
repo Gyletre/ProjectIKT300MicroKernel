@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from classes.i_message_client import IMessageClient
+from micro_kernel.classes.i_message_client import IMessageClient
 from time import time
 from asyncio import run
-from classes.mqtt_client import MQTTClient
+from micro_kernel.classes.mqtt_client import MQTTClient
 
 class AbstractPlugin(MQTTClient):
     """Subscribe to topics with self._Subscribe(topic). \n

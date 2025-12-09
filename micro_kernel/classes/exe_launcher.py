@@ -1,4 +1,4 @@
-from classes.i_launcher import ILauncher
+from i_launcher import ILauncher
 from os.path import dirname
 import subprocess
 
