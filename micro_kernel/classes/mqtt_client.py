@@ -17,7 +17,7 @@ class MQTTClientConfig:
 class MQTTClient(IMessageClient):
     KEEPALIVE = 60
 
-    def __init__(self, config: MQTTClientConfig, on_message) -> None:
+    def __init__(self, config: MQTTClientConfig) -> None:
         self.broker = config.broker
         self.port = config.port
         self.id = config.pid
@@ -28,7 +28,7 @@ class MQTTClient(IMessageClient):
         self.client.on_message = self._OnDataRecieved
 
         self.connected = False
-        self.connect()
+        self._ConnectToBroker()
 
         self.client.loop_start()
 
