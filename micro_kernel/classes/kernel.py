@@ -3,9 +3,9 @@ from classes.i_message_client import IMessageClient
 from classes.mqtt_client import MQTTClient,MQTTClientConfig
 class Kernel(MQTTClient):
     def __init__(self, l: ILauncher,brokerIP,port:int):
-        self.launcher: ILauncher = l
-        self.__Startup(port)
         super().__init__(MQTTClientConfig(-1,brokerIP,port))
+        self.launcher: ILauncher = l
+        self.__Startup()
     def __Startup(self):
         self._ConnectToBroker()
         self.pluginIDs = self.launcher.RunPlugins()
