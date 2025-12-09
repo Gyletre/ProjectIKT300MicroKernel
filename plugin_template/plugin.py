@@ -12,9 +12,9 @@ class IEventBusConfig:
 class IEventBus(ABC):
     KEEPALIVE = 60
 
-    def __init__(self, broker, port) -> None:
-        self.broker = broker
-        self.port = port
+    def __init__(self, event_bus_config: IEventBusConfig) -> None:
+        self.broker = event_bus_config.broker
+        self.port = event_bus_config.port
 
         self.client = mqtt.Client()
         self.client.on_connect = self._on_connect
