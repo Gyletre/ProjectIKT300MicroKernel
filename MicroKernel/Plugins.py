@@ -1,30 +1,57 @@
 import subprocess
-import time
+import os
 
-class ExternalPlugin:
-    def __init__(self, name, path):
-        self.name = name
-        self.file_path = path
-        self.process = None
+class Plugin:
+
+
+    def __init__(self, kernel):
+        self.kernel = kernel
+        self.kernel.add_plugin(self)
 
     def start(self):
-        print(f"Starting plugin: {self.name}")
-        try:
-            self.process = subprocess.Popen(self.file_path)
-            print(f"{self.name} started with PID: {self.process.pid}")
-        except Exception as e:
-            print(f"Error starting {self.name}: {e}")
-
+        pass
     def stop(self):
-        if self.process:
-            print(f"Stopping {self.name}...")
-            self.process.terminate()
-            self.process = None
+        pass
 
     def heart_monitor(self):
-        if self.process:
-            return self.process.poll() is None # Returns True if running
-        return False
-
+        return 1
     def process(self):
         pass
+
+class TestPlugin(Plugin):
+    def start(self):
+        print("Testpluggin has started")
+    def stop(self):
+        print("Testplugin has stopped" )
+    def process(self):
+        print("Testing")
+
+class GUIPlugin(Plugin):
+    def start(self):
+        print("GUIPlugin has started")
+    def process(self):
+        pass
+
+class ExternalPlugin(Plugin):
+    def __init__(self, kernel, path):
+        super().__init__(kernel)
+        self.file_path =  path
+        self.process_obj = None
+    def start(self):
+        try:
+            self.process_obj = subprocess.Popen(self.file_path)
+            print("started external" + self.file_path)
+        except:
+            print("could not start:" + self.file_path)
+
+    def stop(self):
+        if self.process_obj:
+            self.process_obj.terminate()
+            print("Stopped external" +  self.file_path)
+
+    def heart_monitor(self):
+        if self.process_obj is None:
+            return 0
+        if self.process_obj.poll() is not None:
+            return 0 
+        return 1
