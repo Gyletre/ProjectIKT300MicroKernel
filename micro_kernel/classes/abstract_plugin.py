@@ -1,18 +1,18 @@
 from abc import ABC, abstractmethod
 from classes.i_message_client import IMessageClient
-class AbstractPlugin(IMessageClient):
-    def __init__(self,id,port):
+from time import time
+from asyncio import run
+
+class AbstractPlugin():
+    def __init__(self,id,brokerIP,port):
         self.id = id
-        self.ConnectToBroker(port)
+        self.brokerIP = brokerIP
+        self.client = IMessageClient()
+        # connect to broker
+        run(self.HeartBeat)
         super().__init__()
 
     def ShutDown(self):
         del(self)
-        
-    def ConnectToBroker(self, port):
-        return super().ConnectToBroker(port)
-    def SendData(self, topic, msg):
-        return super().SendData(topic, msg)
-    def OnDataRecieved(self, msg):
-        return super().OnDataRecieved(msg)
+
     
