@@ -24,8 +24,5 @@ class EXELauncher(ILauncher):
             pass
 
     def RerunPlugin(self, id):
-        subprocess.Popen([
-                "cmd", "/c", "start", "cmd", "/c", f"python -m {self.plugins[id]} {id} {self.port}"
-                ])
         return super().RerunPlugin(id)
 
