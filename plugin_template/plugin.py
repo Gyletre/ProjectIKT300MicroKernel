@@ -1,25 +1,24 @@
 import paho.mqtt.client as mqtt
 from dataclasses import dataclass
-from abc import ABC, abstractmethod
 
 
 @dataclass
-class IEventBusConfig:
+class MQTTClientConfig:
     broker: str
     port: int
 
 
-class IEventBus(ABC):
+class MQTTClient:
     KEEPALIVE = 60
 
-    def __init__(self, broker, port) -> None:
-        self.broker = broker
-        self.port = port
+    def __init__(self, config: MQTTClientConfig, on_message) -> None:
+        self.broker = config.broker
+        self.port = config.port
 
         self.client = mqtt.Client()
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
-        self.client.on_message = self.on_message
+        self.client.on_message = on_message
 
         self.connected = False
         self.connect()
@@ -34,10 +33,6 @@ class IEventBus(ABC):
 
     def _on_disconnect(self, client, userdata, rc):
         self.connected = False
-
-    @abstractmethod
-    def on_message(self, client, userdata, msg: mqtt.MQTTMessage):
-        pass
 
     def publish(self, topic, payload, qos=0, retain=False):
         if not self.connected:
