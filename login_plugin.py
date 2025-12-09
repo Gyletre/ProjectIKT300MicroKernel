@@ -1,3 +1,5 @@
+"""topics: accmgr/*"""
+
 import json
 
 from PySide6.QtGui import QKeyEvent
@@ -13,7 +15,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 
-from micro_kernel import AbstractPlugin, MQTTClientConfig, MQTTMessage
+from micro_kernel import AbstractPlugin, MQTTMessage
 
 
 class LoginPage(QWidget):
@@ -113,19 +115,20 @@ class PluginWindow(AbstractPlugin):
 
         self.widget.setCurrentIndex(0)
 
-        self._Subscribe('account')
+        # self._Subscribe('account')
 
     def show_login_page(self):
-        self._SendData('account', json.dumps({
-            'type': 'UserLoggedOutEvent',
-            'payload': {'username': self.username}
-        }))
+        if self.username is not None:
+            self._SendData('accmgr/user', json.dumps({
+                'type': 'UserLoggedOutEvent',
+                'payload': {'username': self.username}
+            }))
         self.widget.setCurrentIndex(0)
 
     def show_logout_page(self, username, password):
         self.username = username
         self.password = password
-        self._SendData('account', json.dumps({
+        self._SendData('accmgr/user', json.dumps({
             'type': 'UserLoggedInEvent',
             'payload': {'username': username, 'password': password}
         }))
@@ -134,16 +137,13 @@ class PluginWindow(AbstractPlugin):
     def _OnDataRecieved(self, client, userdata, message: MQTTMessage):
         if message.topic == 'terminate':
             exit()
-        elif message.topic == 'account':
-            print(json.loads(message.payload))
+        # elif message.topic == 'account':
+        #     print(json.loads(message.payload))
 
 
 if __name__ == '__main__':
     app = QApplication([])
-
     plugin = PluginWindow()
-
-    # Only show the internal widget
     window = plugin.widget
     window.setWindowTitle('User Login Plugin')
     window.resize(300, 100)
