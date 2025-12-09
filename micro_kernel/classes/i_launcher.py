@@ -1,8 +1,12 @@
-import abc
-class ILauncher(metaclass=abc.ABCMeta): #abstract base class
-    def LoadConfigFile():
+from abc import ABC, abstractmethod
+
+class ILauncher(ABC):  # abstract base class
+    @abstractmethod
+    def LoadConfigFile(self):
         pass
-    def RunPlugins():
+    @abstractmethod
+    def RunPlugins(self):
         pass
-    def RerunPlugin(id: str):
+    @abstractmethod
+    def RerunPlugin(self, id: str):
         pass
