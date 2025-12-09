@@ -1,6 +1,6 @@
 import abc
 class ILauncher(metaclass=abc.ABCMeta): #abstract base class
-    def LoadConfigFile():
+    def _LoadConfigFile():
         pass
     def RunPlugins():
         pass
