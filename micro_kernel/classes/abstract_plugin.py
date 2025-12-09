@@ -7,8 +7,8 @@ from classes.mqtt_client import MQTTClient
 class AbstractPlugin(MQTTClient):
     """Subscribe to topics with self._Subscribe(topic). \n
     Then override self._OnDataRecieved() and self.SendData() to add plugin specific implementation"""
-    def __init__(self, config, on_message):
-        super().__init__(config, on_message)
+    def __init__(self, config):
+        super().__init__(config)
 
     def ShutDown(self):
         del(self)
