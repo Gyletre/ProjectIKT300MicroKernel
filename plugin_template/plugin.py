@@ -9,14 +9,18 @@ class MQTTClientConfig:
     broker: str
     port: int
 
-    def from_sys(self):
+    @staticmethod
+    def from_sys():
         return MQTTClientConfig(int(sys.argv[1]), sys.argv[2], int(sys.argv[3]))
 
 
 class MQTTClient:
     KEEPALIVE = 60
 
-    def __init__(self, config: MQTTClientConfig, on_message) -> None:
+    def __init__(self, config: MQTTClientConfig|None, on_message) -> None:
+        if config is None:
+            config = MQTTClientConfig.from_sys()
+
         self.broker = config.broker
         self.port = config.port
         self.id = config.pid
