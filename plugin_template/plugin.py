@@ -1,11 +1,16 @@
 import paho.mqtt.client as mqtt
 from dataclasses import dataclass
+import sys
 
 
 @dataclass
 class MQTTClientConfig:
+    pid: int
     broker: str
     port: int
+
+    def from_sys(self):
+        return MQTTClientConfig(int(sys.argv[1]), sys.argv[2], int(sys.argv[3]))
 
 
 class MQTTClient:
@@ -14,6 +19,7 @@ class MQTTClient:
     def __init__(self, config: MQTTClientConfig, on_message) -> None:
         self.broker = config.broker
         self.port = config.port
+        self.id = config.pid
 
         self.client = mqtt.Client()
         self.client.on_connect = self._on_connect
