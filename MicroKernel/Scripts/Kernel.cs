@@ -12,9 +12,19 @@ public class Kernel
     {
         plugins.Add(plugin);
     }
+
+    public void RestartPlugin(Plugin plugin){
+        plugin.Stop();
+        plugin.Start();}
+
     public void Run()
     {
         Console.WriteLine("Greetings, Universe");
+        foreach  (Plugin plugin in  plugins){
+            plugin.Start();
+        }
+        
+
         oldTime = CurrentTime();
         int timeToRun = 300;
         while (running)
@@ -35,7 +45,13 @@ public class Kernel
                     else
                     {
                         Console.WriteLine("plugin did not work");
-                        plugins.RemoveAt(i);
+                        RestartPlugin(plugins[i]);
+                        if (plugins[i].HeartMonitor() == 1){
+                            Console.WriteLine("Plugin has restarted successfully");
+                        }
+                        else{
+                            plugins[i].Stop();
+                            plugins.RemoveAt(i);}
                     }
                 }
                 if (timeToRun-- < 0)
@@ -43,6 +59,10 @@ public class Kernel
                     running = false;
                 }
             }
+        }
+
+        foreach (Plugin plugin in plugins){
+            plugin.Stop();
         }
     }
     private double CurrentTime()
@@ -63,5 +83,7 @@ public abstract class Plugin
         {
             return 1;
         }
+        public virtual void Start() {}
+        public virtual void Stop() {}
         public abstract void Process();
     }
