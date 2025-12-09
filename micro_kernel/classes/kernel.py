@@ -6,7 +6,6 @@ class Kernel:
     def Startup(self):
         self.pluginIDs = self.launcher.RunPlugins()
     def ShutDownAll(self):
-        # Send shut down message to all plugins
         pass
     def __del__(self):
         self.ShutDownAll()

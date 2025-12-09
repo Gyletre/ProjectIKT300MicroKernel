@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class ILauncher(ABC):  # abstract base class
+class ILauncher(ABC):
     @abstractmethod
     def LoadConfigFile(self):
         pass
