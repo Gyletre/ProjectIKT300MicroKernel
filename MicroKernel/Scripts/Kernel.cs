@@ -1,5 +1,5 @@
+using IKT300.Launcher;
 namespace IKT300;
-
 public class Kernel
 {
     bool running = true;
@@ -7,9 +7,13 @@ public class Kernel
     double programTime = 0;
     double fps = 60;
 
-    List<Plugin> plugins = new();
-    public void AddPlugin(Plugin plugin)
-    {
+    ILauncher launcher;
+
+    public void SetLauncher(ILauncher l){
+        launcher = l;}
+
+    List<Plugin> plugins  = new();
+    public void AddPlugin(Plugin plugin){
         plugins.Add(plugin);
     }
 
@@ -17,8 +21,10 @@ public class Kernel
         plugin.Stop();
         plugin.Start();}
 
-    public void Run()
-    {
+    public void Run(){
+        if (launcher != null){
+            launcher.RunPlugins(this);
+        }
         Console.WriteLine("Greetings, Universe");
         foreach  (Plugin plugin in  plugins){
             plugin.Start();
