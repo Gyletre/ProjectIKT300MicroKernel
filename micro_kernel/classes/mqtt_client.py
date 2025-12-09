@@ -1,5 +1,5 @@
 import paho.mqtt.client as mqtt
-from micro_kernel.classes.i_message_client import IMessageClient
+from micro_kernel.i_message_client import IMessageClient
 from dataclasses import dataclass
 import sys
 

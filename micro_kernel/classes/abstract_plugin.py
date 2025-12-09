@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from micro_kernel.classes.i_message_client import IMessageClient
+from micro_kernel.i_message_client import IMessageClient
 from time import time
 from asyncio import run
 from micro_kernel.classes.mqtt_client import MQTTClient
