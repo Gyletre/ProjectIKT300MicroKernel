@@ -97,7 +97,7 @@ class LogoutPage(QWidget):
 
 class PluginWindow(AbstractPlugin):
     def __init__(self):
-        super().__init__(MQTTClientConfig(1, 'localhost', 1883))
+        super().__init__()
 
         self.username = None
         self.password = None
