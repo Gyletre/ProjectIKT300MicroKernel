@@ -1,6 +1,6 @@
-from classes.i_launcher import ILauncher
-from classes.i_message_client import IMessageClient
-from classes.mqtt_client import MQTTClient,MQTTClientConfig
+from i_launcher import ILauncher
+from i_message_client import IMessageClient
+from mqtt_client import MQTTClient,MQTTClientConfig
 class Kernel(MQTTClient):
     def __init__(self, l: ILauncher,brokerIP,port:int):
         super().__init__(MQTTClientConfig(-1,brokerIP,port))

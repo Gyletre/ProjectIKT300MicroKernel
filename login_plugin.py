@@ -1,10 +1,19 @@
 import json
 
 from PySide6.QtGui import QKeyEvent
-from PySide6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QLabel, QVBoxLayout, QHBoxLayout, QStackedWidget
+from PySide6.QtWidgets import (
+    QApplication,
+    QWidget,
+    QLineEdit,
+    QPushButton,
+    QLabel,
+    QVBoxLayout,
+    QHBoxLayout,
+    QStackedWidget
+)
 from PySide6.QtCore import Qt
 
-from micro_kernel import AbstractPlugin
+from micro_kernel import AbstractPlugin, MQTTClientConfig, MQTTMessage
 
 
 class LoginPage(QWidget):
@@ -57,7 +66,6 @@ class LoginPage(QWidget):
 
         if username and password:
             self.message.setText('')
-            # print('Logged in as username=' + username + ', password=' + password)
             self.user_input.setFocus()
             self.on_login(username, password)
         else:
@@ -87,38 +95,56 @@ class LogoutPage(QWidget):
             self.logout_button.click()
 
 
-class PluginWindow(QStackedWidget, AbstractPlugin):
+class PluginWindow(AbstractPlugin):
     def __init__(self):
-        super().__init__()
+        super().__init__(MQTTClientConfig(1, 'localhost', 1883))
 
-        self.username = self.password = None
+        self.username = None
+        self.password = None
+
+        # The plugin is NOT a Qt widget now — it contains one
+        self.widget = QStackedWidget()
 
         self.login_page = LoginPage(self.show_logout_page)
         self.logout_page = LogoutPage(self.show_login_page)
 
-        self.addWidget(self.login_page)
-        self.addWidget(self.logout_page)
+        self.widget.addWidget(self.login_page)
+        self.widget.addWidget(self.logout_page)
 
-        self.setCurrentIndex(0)
+        self.widget.setCurrentIndex(0)
+
+        self._Subscribe('account')
 
     def show_login_page(self):
-        self._SendData('account', json.dumps({'type': 'UserLoggedOutEvent', 'payload': {'username': self.username}}))
-        self.setCurrentIndex(0)
+        self._SendData('account', json.dumps({
+            'type': 'UserLoggedOutEvent',
+            'payload': {'username': self.username}
+        }))
+        self.widget.setCurrentIndex(0)
 
     def show_logout_page(self, username, password):
         self.username = username
         self.password = password
-        self._SendData('account', json.dumps({'type': 'UserLoggedInEvent', 'payload': {'username': username, 'password': password}}))
-        self.setCurrentIndex(1)
+        self._SendData('account', json.dumps({
+            'type': 'UserLoggedInEvent',
+            'payload': {'username': username, 'password': password}
+        }))
+        self.widget.setCurrentIndex(1)
 
-    def _OnDataRecieved(self, client, userdata, message):
+    def _OnDataRecieved(self, client, userdata, message: MQTTMessage):
         if message.topic == 'terminate':
             exit()
+        elif message.topic == 'account':
+            print(json.loads(message.payload))
 
 
 if __name__ == '__main__':
     app = QApplication([])
-    window = PluginWindow()
+
+    plugin = PluginWindow()
+
+    # Only show the internal widget
+    window = plugin.widget
     window.setWindowTitle('User Login Plugin')
     window.resize(300, 100)
     window.show()
