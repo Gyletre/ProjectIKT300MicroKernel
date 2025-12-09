@@ -9,14 +9,12 @@ class Kernel:
 
     def set_launcher(self, launcher):
         self.launcher = launcher
-
     def add_plugin(self, plugin):
         self.plugins.append(plugin)
 
     def restart_plugin(self, plugin):
         plugin.stop()
         plugin.start()
-
     def run(self):
         print("Greetings, Universe")
         
