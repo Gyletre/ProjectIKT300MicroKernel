@@ -2,6 +2,7 @@ import paho.mqtt.client as mqtt
 from micro_kernel.i_message_client import IMessageClient
 from dataclasses import dataclass
 import sys
+import json
 
 
 MQTTMessage = mqtt.MQTTMessage
@@ -19,7 +20,7 @@ class MQTTClientConfig:
 
 
 class MQTTClient(IMessageClient):
-    KEEPALIVE = 60
+    KEEPALIVE = 10
 
     def __init__(self, config: MQTTClientConfig|None = None) -> None:
         if config is None:
@@ -36,6 +37,8 @@ class MQTTClient(IMessageClient):
 
         self.connected = False
         self._ConnectToBroker()
+
+        self.client.will_set('plugins/morgue', json.dumps({'type': 'Error', 'payload': {'id': self.id}}))
 
         self.client.loop_start()
 
