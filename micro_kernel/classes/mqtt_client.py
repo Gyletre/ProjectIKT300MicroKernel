@@ -68,8 +68,3 @@ class MQTTClient(IMessageClient):
     def __on_disconnect(self, client, userdata, rc, *_):
         self.connected = False
         print('disconnected from broker')
-
-
-if __name__ == '__main__':
-    MQTTClient(MQTTClientConfig(1, 'localhost', 9001))
-    
