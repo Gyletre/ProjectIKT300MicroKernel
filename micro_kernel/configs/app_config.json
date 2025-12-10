@@ -1,3 +1,21 @@
 {
-    
+    "mqtt": {
+        "broker_host": "localhost",
+        "broker_port": 1883
+    },
+    "plugins_directory": "plugins",
+    "plugins": [
+        {
+            "name": "LoginPlugin",
+            "path": "LoginPlugin",
+            "enabled": true,
+            "restart_on_failure": false
+        },
+        {
+            "name": "MetricsLoggerProcess",
+            "path": "MetricsLoggerProcess",
+            "enabled": true,
+            "restart_on_failure": true
+        }
+    ]
 }

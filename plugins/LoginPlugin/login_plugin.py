@@ -1,6 +1,11 @@
 """topics: accmgr/*"""
 
 import json
+from pathlib import Path
+import sys
+import time
+import os
+import threading
 
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
@@ -15,7 +20,10 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 
-from micro_kernel import AbstractPlugin, MQTTMessage
+path = Path(__file__).resolve().parent.parent.parent / 'shared'
+sys.path.insert(0, str(path))
+
+from lib import AbstractPlugin, MQTTMessage  # type: ignore
 
 
 class LoginPage(QWidget):
@@ -115,7 +123,12 @@ class PluginWindow(AbstractPlugin):
 
         self.widget.setCurrentIndex(0)
 
-        # self._Subscribe('account')
+        time.sleep(1)
+        self._Subscribe('kernel/heartbeat')
+
+        self.last_kernel_heartbeat = time.time()
+        t = threading.Thread(target=self.watchdog, daemon=True)
+        t.start()
 
     def show_login_page(self):
         if self.username is not None:
@@ -134,11 +147,15 @@ class PluginWindow(AbstractPlugin):
         }))
         self.widget.setCurrentIndex(1)
 
-    def _OnDataRecieved(self, client, userdata, message: MQTTMessage):
-        if message.topic == 'terminate':
-            exit()
-        # elif message.topic == 'account':
-        #     print(json.loads(message.payload))
+    def _OnDataReceived(self, client, userdata, message: MQTTMessage):
+        if message.topic == 'kernel/heartbeat':
+            self.last_kernel_heartbeat = time.time()
+
+    def watchdog(self):
+        while True:
+            if time.time() - self.last_kernel_heartbeat > self.NO_HEARTBEAT_EXIT:
+                os._exit(0)
+            time.sleep(1)
 
 
 if __name__ == '__main__':

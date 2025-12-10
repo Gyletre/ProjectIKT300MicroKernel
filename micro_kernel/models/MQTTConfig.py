@@ -1,5 +1,5 @@
-from typing import Optional
 from pydantic import BaseModel, Field
+
 
 class MQTTConfig(BaseModel):
     broker_host: str = Field(..., description="MQTT broker hostname")
