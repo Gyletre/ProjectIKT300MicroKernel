@@ -4,6 +4,8 @@ import sys
 import json
 import atexit
 import time
+import threading
+import os
 
 from .i_message_client import IMessageClient
 
@@ -23,7 +25,7 @@ class MQTTClientConfig:
 
 
 class MQTTClient(IMessageClient):
-    KEEPALIVE = 10
+    KEEPALIVE = 3
     NO_HEARTBEAT_EXIT = 3
 
     def __init__(self, config: MQTTClientConfig|None = None) -> None:
@@ -47,6 +49,10 @@ class MQTTClient(IMessageClient):
         atexit.register(self._on_exit)
 
         self.client.loop_start()
+
+        self.last_kernel_heartbeat = time.time()
+        t = threading.Thread(target=self.watchdog, daemon=True)
+        t.start()
 
     def _ConnectToBroker(self):
         self.client.connect(self.broker, self.port, self.KEEPALIVE)
@@ -75,6 +81,14 @@ class MQTTClient(IMessageClient):
     def __on_disconnect(self, client, userdata, rc, *_):
         self.connected = False
         print('disconnected from broker')
+
+    def watchdog(self):
+        if self.id == -1: return
+        while True:
+            if time.time() - self.last_kernel_heartbeat > self.NO_HEARTBEAT_EXIT:
+                os._exit(0)
+            self._SendData(f'heartbeat/{self.id}', 'ok')
+            time.sleep(1)
 
     def _on_exit(self):
         self._SendData('plugins/morgue', json.dumps({'type': 'Exit', 'payload': {'id': self.id}}))

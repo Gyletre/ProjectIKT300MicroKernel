@@ -22,10 +22,6 @@ class MetricsLoggerProcess(AbstractPlugin):
         self._Subscribe('accmgr/user')
         self._Subscribe('dataprocessor/events')  # this one is unused
 
-        self.last_kernel_heartbeat = time.time()
-        t = threading.Thread(target=self.watchdog, daemon=True)
-        t.start()
-
     def _OnUserLoggedInEvent(self, payload):
         self.messages += 1
         print(f'[{self.messages}]', payload)
@@ -45,12 +41,6 @@ class MetricsLoggerProcess(AbstractPlugin):
             payload = json.loads(message.payload)
             if payload['type'] == 'DataProcessedEvent':
                 self._OnDataProcessedEvent(payload)
-
-    def watchdog(self):
-        while True:
-            if time.time() - self.last_kernel_heartbeat > self.NO_HEARTBEAT_EXIT:
-                os._exit(0)
-            time.sleep(1)
 
 
 if __name__ == '__main__':

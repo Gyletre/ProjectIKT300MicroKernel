@@ -4,6 +4,7 @@ import sys
 import time
 import json
 import threading
+from collections import defaultdict
 
 from .ConfigService import ConfigService
 from .PythonLauncher import PythonLauncher
@@ -29,16 +30,29 @@ class Kernel(AbstractPlugin):
         for pid, plugin, process in self.launcher.RunPlugins():
             self.plugins[pid] = (plugin, process)
 
+        self.plugin_status = defaultdict(lambda: time.time())
+
         time.sleep(1)
-        self._Subscribe('accmgr/#')
         self._Subscribe('plugins/morgue')
+        self._Subscribe('heartbeat/#')
 
         t = threading.Thread(target=self._heartbeat, daemon=True)
         t.start()
 
+        self.status_lock = threading.Lock()
+
     def _heartbeat(self):
         while True:
             self._SendData('kernel/heartbeat', "I'm alive!")
+            for pid, (plugin, process) in list(self.plugins.items()):
+                if time.time() - self.plugin_status[pid] > self.KEEPALIVE:
+                    del self.plugins[pid]
+                    process.kill()
+                    if plugin.restart_on_failure:
+                        result = self.launcher.RunPlugin(plugin)
+                        if result is None: continue
+                        pid, plugin, process = result
+                        self.plugins[pid] = (plugin, process)
             time.sleep(1)
 
     def _OnDataReceived(self, client, userdata, message: MQTTMessage):
@@ -54,3 +68,7 @@ class Kernel(AbstractPlugin):
                 if result is None: return
                 pid, plugin, process = result
                 self.plugins[pid] = (plugin, process)
+        if message.topic.startswith('heartbeat/'):
+            # print('heartbeat:', message.topic)
+            pid = int(message.topic.split('/')[1])
+            self.plugin_status[pid] = time.time()
