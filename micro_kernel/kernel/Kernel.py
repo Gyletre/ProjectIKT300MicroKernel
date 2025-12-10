@@ -12,11 +12,11 @@ from .PythonLauncher import PythonLauncher
 path = Path(__file__).resolve().parent.parent.parent / 'shared'
 sys.path.insert(0, str(path))
 
-from lib import AbstractPlugin, MQTTMessage, MQTTClientConfig  # type: ignore
+from lib import MQTTMessage, MQTTClientConfig, MQTTClient  # type: ignore
 
 
-class Kernel(AbstractPlugin):
-    def __init__(self, config_path: Optional[str] = None) -> None:
+class Kernel(MQTTClient):
+    def __init__(self, config_path: Optional[str] = None, launcher = PythonLauncher) -> None:
         if config_path is None:
             config_path = str(Path(__file__).resolve().parent.parent / 'configs/app_config.json')
         
@@ -24,7 +24,7 @@ class Kernel(AbstractPlugin):
 
         super().__init__(MQTTClientConfig(-1, self.config_service.app_config.mqtt.broker_host, self.config_service.app_config.mqtt.broker_port))
 
-        self.launcher = PythonLauncher(self.config_service)
+        self.launcher = launcher(self.config_service)
 
         self.plugins = dict()
         for pid, plugin, process in self.launcher.RunPlugins():

@@ -16,7 +16,7 @@ MQTTMessage = mqtt.MQTTMessage
 @dataclass
 class MQTTClientConfig:
     pid: int
-    broker: str
+    brokerIP: str
     port: int
 
     @staticmethod
@@ -32,7 +32,7 @@ class MQTTClient(IMessageClient):
         if config is None:
             config = MQTTClientConfig.from_sys()
 
-        self.broker = config.broker
+        self.broker = config.brokerIP
         self.port = config.port
         self.id = config.pid
 

@@ -126,10 +126,6 @@ class PluginWindow(AbstractPlugin):
         time.sleep(1)
         self._Subscribe('kernel/heartbeat')
 
-        # self.last_kernel_heartbeat = time.time()
-        # t = threading.Thread(target=self.watchdog, daemon=True)
-        # t.start()
-
     def show_login_page(self):
         if self.username is not None:
             self._SendData('accmgr/user', json.dumps({
@@ -150,13 +146,6 @@ class PluginWindow(AbstractPlugin):
     def _OnDataReceived(self, client, userdata, message: MQTTMessage):
         if message.topic == 'kernel/heartbeat':
             self.last_kernel_heartbeat = time.time()
-
-    # def watchdog(self):
-    #     while True:
-    #         if time.time() - self.last_kernel_heartbeat > self.NO_HEARTBEAT_EXIT:
-    #             os._exit(0)
-    #         time.sleep(1)
-
 
 if __name__ == '__main__':
     app = QApplication([])

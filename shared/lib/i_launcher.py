@@ -5,3 +5,6 @@ class ILauncher(ABC):  # abstract base class
     @abstractmethod
     def RunPlugins(self):
         pass
+    @abstractmethod
+    def RunPlugin(self,plugin):
+        pass
